@@ -17,3 +17,4 @@ runs:
     
     - name: Unpacking FPC
       run: tar -xvzf ${{ github.workspace }}/.fpc/release_3_2_2.tar.gz -C ${{ github.workspace }}/.fpc/release_3_2_2
+      shell: bash

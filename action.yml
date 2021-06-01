@@ -1,0 +1,19 @@
+name: 'Setup FPC environment'
+
+description: 'Setup a Free Pascal Compiler and add it to the PATH'
+
+inputs:
+  fpc-version:
+    description: 'Version of required FPC'
+    required: false
+    default: 'stable'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Fetching FPC bundle
+      run: ${{ github.action_path }}/fpc-fetch.sh ${{ github.workspace }}
+      shell: bash
+    
+    - name: Unpacking FPC
+      run: tar -xvzf ${{ github.workspace }}/.fpc/release_3_2_2.tar.gz -C ${{ github.workspace }}/.fpc/release_3_2_2

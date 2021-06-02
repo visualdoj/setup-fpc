@@ -2,6 +2,10 @@ name: 'Setup FPC environment'
 
 description: 'Setup a Free Pascal Compiler and add it to the PATH'
 
+branding:
+  icon: 'gitlab'
+  color: '#CE9C63'
+
 inputs:
   fpc-version:
     description: 'Version of required FPC'

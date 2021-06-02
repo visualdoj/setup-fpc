@@ -11,13 +11,22 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Caching Free Pascal Compiler
+      uses: actions/cache@v2
+      id: cache_fpc_installation
+      with:
+        key: cache_fpc_installation
+        path: .fpc/release_3_2_2
+
     - name: Fetching FPC bundle
+      if: steps.cache_fpc_installation.outputs.cache-hit != 'true'
       run: |
           mkdir ${{ github.workspace }}\.fpc
           curl -L https://github.com/visualdoj/free-pascal-compiler-builds/releases/download/v0.1-alpha/release_3_2_2.zip --output ${{ github.workspace }}\.fpc\release_3_2_2.zip
       shell: cmd
     
     - name: Unpacking FPC
+      if: steps.cache_fpc_installation.outputs.cache-hit != 'true'
       run: Expand-Archive -LiteralPath ${{ github.workspace }}\.fpc\release_3_2_2.zip -DestinationPath ${{ github.workspace }}\.fpc\release_3_2_2
       shell: powershell
     

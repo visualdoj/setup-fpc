@@ -14,7 +14,7 @@ runs:
     - name: Fetching FPC bundle
       run: |
           mkdir ${{ github.workspace }}\.fpc
-          curl https://github.com/visualdoj/free-pascal-compiler-builds/releases/download/v0.1-alpha/release_3_2_2.zip --output ${{ github.workspace }}\.fpc\release_3_2_2.zip
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3.raw" https://github.com/visualdoj/free-pascal-compiler-builds/releases/download/v0.1-alpha/release_3_2_2.zip --output ${{ github.workspace }}\.fpc\release_3_2_2.zip
       shell: cmd
     
     - name: Unpacking FPC

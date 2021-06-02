@@ -12,9 +12,9 @@ runs:
   using: "composite"
   steps:
     - name: Fetching FPC bundle
-      run: curl https://github.com/visualdoj/free-pascal-compiler-builds/releases/download/v0.1-alpha/release_3_2_2.tar.gz --output ${{ github.workspace }}/release_3_2_2.tar.gz
-      shell: bash
+      run: curl https://github.com/visualdoj/free-pascal-compiler-builds/releases/download/v0.1-alpha/release_3_2_2.tar.gz --output ${{ github.workspace }}\release_3_2_2.tar.gz
+      shell: cmd
     
     - name: Unpacking FPC
-      run: tar -xvzf ${{ github.workspace }}/.fpc/release_3_2_2.tar.gz -C ${{ github.workspace }}/.fpc/release_3_2_2
-      shell: bash
+      run: tar -xvzf ${{ github.workspace }}\.fpc\release_3_2_2.tar.gz -C ${{ github.workspace }}\.fpc\release_3_2_2
+      shell: cmd

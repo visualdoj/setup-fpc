@@ -14,9 +14,9 @@ runs:
     - name: Fetching FPC bundle
       run: |
           mkdir ${{ github.workspace }}\.fpc
-          curl https://github.com/visualdoj/free-pascal-compiler-builds/releases/download/v0.1-alpha/release_3_2_2.tar.gz --output ${{ github.workspace }}\.fpc\release_3_2_2.tar.gz
+          curl https://github.com/visualdoj/free-pascal-compiler-builds/releases/download/v0.1-alpha/release_3_2_2.zip --output ${{ github.workspace }}\.fpc\release_3_2_2.zip
       shell: cmd
     
     - name: Unpacking FPC
-      run: tar -xvzf ${{ github.workspace }}\.fpc\release_3_2_2.tar.gz -C ${{ github.workspace }}\.fpc\release_3_2_2
-      shell: cmd
+      run: Expand-Archive -LiteralPath ${{ github.workspace }}\.fpc\release_3_2_2.zip -DestinationPath ${{ github.workspace }}\.fpc\release_3_2_2
+      shell: powershell

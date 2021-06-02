@@ -20,3 +20,7 @@ runs:
     - name: Unpacking FPC
       run: Expand-Archive -LiteralPath ${{ github.workspace }}\.fpc\release_3_2_2.zip -DestinationPath ${{ github.workspace }}\.fpc\release_3_2_2
       shell: powershell
+    
+    - name: Update PATH
+      run: echo ${{ github.workspace }}\.fpc\release_3_2_2\bin\i386-win32 | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      shell: powershell

@@ -59,7 +59,7 @@ runs:
 
     - name: Download FPC bundle
       if: steps.check-cache.outputs.cache-hit != 'true'
-      run:  gh release download --dir .fpc --pattern "bundle-${{ runner.os }}.tar.gz" --repo visualdoj/build-fpc-bundle
+      run:  gh release download --dir .fpc-${{ inputs.version }} --pattern "bundle-${{ runner.os }}.tar.gz" --repo visualdoj/build-fpc-bundle
       shell: bash
       env:
           GITHUB_TOKEN: ${{ inputs.repo-token }}
@@ -69,7 +69,7 @@ runs:
       working-directory: "${{ github.workspace }}"
       shell: bash
       run: |
-          tar xvf ".fpc/bundle-${{ runner.os }}.tar.gz" -C ".fpc-${{ inputs.version }}"
+          tar xvf ".fpc-${{ inputs.version }}/bundle-${{ runner.os }}.tar.gz" -C ".fpc-${{ inputs.version }}"
 
     - name: Configure PATH (Windows)
       if: runner.os == 'Windows'

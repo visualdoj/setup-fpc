@@ -1,30 +1,85 @@
-name: 'Setup FPC environment'
-
-description: 'Setup a Free Pascal Compiler and add it to the PATH'
+name: 'Setup Free Pascal Compiler'
 
 branding:
   icon: 'gitlab'
   color: '#CE9C63'
 
 inputs:
-  fpc-version:
+  repo-token:
+    description: 'GitHub token'
+    required: true
+    default: ${{ github.token }}
+  version:
     description: 'Version of required FPC'
     required: false
     default: 'stable'
+  os:
+    description: 'OS label'
+    required: false
+    default: 'default'
+  cpu:
+    description: 'Host CPU'
+    required: false
+    default: 'x64'
+  repo:
+    description: 'GitHub repo with Free Pascal bundles'
+    required: false
+    default: 'visualdoj/build-fpc-bundle'
+  tag:
+    description: 'Release tag in the repo with bundles'
+    required: false
+    default: 'bootstrap1'
+
+outputs:
+  cache-hit:
+    description: 'The bundle was taken from cache'
+    value: ${{ steps.check-cache.outputs.cache-hit }}
+  # fpc-bin-path:
+  #   description: 'Directory with FPC binaries'
+  #   value: ${{ steps.configuration.fpc-bin-path }}
+  # fpc-lib-path:
+  #   description: 'Directory with ppc* binaries'
+  #   value: ${{ steps.configuration.fpc-lib-path }}
+  # fpc-units-path:
+  #   description: 'Directory with FPC units'
+  #   value: ${{ steps.configuration.fpc-units-path }}
+  # fpc-cfg-path:
+  #   description: 'Path to fpc.cfg'
+  #   value: ${{ steps.configuration.fpc-cfg-path }}
 
 runs:
   using: "composite"
   steps:
-    - name: Fetching FPC bundle
+    - name: Cache installed FPC
+      id: check-cache
+      uses: actions/cache@v3
+      with:
+          key:  ".fpc-${{ inputs.version }}"
+          path: ".fpc-${{ inputs.version }}"
+
+    - name: Download FPC bundle
+      if: steps.check-cache.outputs.cache-hit != 'true'
+      run:  gh release download --dir .fpc --pattern "bundle-${{ runner.os }}.tar.gz" --repo visualdoj/build-fpc-bundle
+      shell: bash
+      env:
+          GITHUB_TOKEN: ${{ inputs.repo-token }}
+
+    - name: Unpack tarball 
+      if: steps.check-cache.outputs.cache-hit != 'true'
+      working-directory: "${{ github.workspace }}"
+      shell: bash
       run: |
-          mkdir ${{ github.workspace }}\.fpc
-          curl -L https://github.com/visualdoj/free-pascal-compiler-builds/releases/download/v0.1-alpha/release_3_2_2.zip --output ${{ github.workspace }}\.fpc\release_3_2_2.zip
-      shell: cmd
-    
-    - name: Unpacking FPC
-      run: Expand-Archive -LiteralPath ${{ github.workspace }}\.fpc\release_3_2_2.zip -DestinationPath ${{ github.workspace }}\.fpc\release_3_2_2
-      shell: powershell
-    
-    - name: Update PATH
-      run: echo ${{ github.workspace }}\.fpc\release_3_2_2\bin\i386-win32 | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      shell: powershell
+          tar xvf ".fpc/bundle-${{ runner.os }}.tar.gz" -C ".fpc-${{ inputs.version }}"
+
+    - name: Configure PATH (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+           echo "${{ github.workspace }}\\.fpc-${{ inputs.version }}\\bundle\\installed\\bin\\i386-win32" >> $GITHUB_PATH
+
+    - name: Configure PATH (Linux)
+      if: runner.os != 'Windows'
+      shell: bash
+      run: |
+           echo  "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/bin" >> $GITHUB_PATH
+           echo  "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/lib/fpc/${{ inputs.fpc_version }}" >> $GITHUB_PATH

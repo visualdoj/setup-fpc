@@ -10,7 +10,7 @@ inputs:
     required: true
     default: ${{ github.token }}
   version:
-    description: 'Version of required FPC'
+    description: 'Logical version of required FPC'
     required: false
     default: 'stable'
   os:
@@ -29,6 +29,10 @@ inputs:
     description: 'Release tag in the repo with bundles'
     required: false
     default: 'bootstrap1'
+  fpc_version:
+    description: 'Numeral version of required FPC'
+    required: false
+    default: '3.2.3'
 
 outputs:
   cache-hit:
@@ -83,3 +87,5 @@ runs:
       run: |
            echo  "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/bin" >> $GITHUB_PATH
            echo  "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/lib/fpc/${{ inputs.fpc_version }}" >> $GITHUB_PATH
+           # TODO the following line is only for macOS until version detection will be supported
+           echo  "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/lib/fpc/3.3.1" >> $GITHUB_PATH

@@ -80,7 +80,6 @@ runs:
       shell: bash
       run: |
            echo "${{ github.workspace }}\\.fpc-${{ inputs.version }}\\bundle\\installed\\bin\\i386-win32" >> $GITHUB_PATH
-           fpcmkcfg -d basepath="${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed" -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
 
     - name: Configure (non-Windows)
       if: runner.os != 'Windows'
@@ -90,5 +89,17 @@ runs:
            echo  "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/lib/fpc/${{ inputs.fpc_version }}" >> $GITHUB_PATH
            # TODO the following line is only for macOS until version detection will be supported
            echo  "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/lib/fpc/3.3.1" >> $GITHUB_PATH
+
+    - name: fpc.cfg (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+           fpcmkcfg -d basepath="${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed" -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
+           echo "PPC_CONFIG_PATH=${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg" >> $GITHUB_ENV
+
+    - name: fpc.cfg (non-Windows)
+      if: runner.os != 'Windows'
+      shell: bash
+      run: |
            fpcmkcfg -d basepath="${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/lib/fpc/${{ inputs.fpc_version }}" -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
            echo "PPC_CONFIG_PATH=${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg" >> $GITHUB_ENV

@@ -95,11 +95,11 @@ runs:
       shell: bash
       run: |
            fpcmkcfg -d basepath="${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed" -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
-           echo "PPC_CONFIG_PATH=${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg" >> $GITHUB_ENV
+           echo "PPC_CONFIG_PATH=${{ github.workspace }}/.fpc-${{ inputs.version }}" >> $GITHUB_ENV
 
     - name: fpc.cfg (non-Windows)
       if: runner.os != 'Windows'
       shell: bash
       run: |
            fpcmkcfg -d basepath="${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/lib/fpc/${{ inputs.fpc_version }}" -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
-           echo "PPC_CONFIG_PATH=${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg" >> $GITHUB_ENV
+           echo "PPC_CONFIG_PATH=${{ github.workspace }}/.fpc-${{ inputs.version }}" >> $GITHUB_ENV

@@ -75,10 +75,6 @@ runs:
       run: |
           tar xvf ".fpc-${{ inputs.version }}/bundle-${{ runner.os }}.tar.gz" -C ".fpc-${{ inputs.version }}"
 
-    - name: Configure fpc.cfg
-      working-directory: "${{ github.workspace }}"
-      run: echo "${{ github.workspace }}\\.fpc-${{ inputs.version }}\\bundle\\installed\\bin\\i386-win32" >> $GITHUB_PATH
-
     - name: Configure (Windows)
       if: runner.os == 'Windows'
       shell: bash

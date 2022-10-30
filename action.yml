@@ -93,5 +93,5 @@ runs:
     - name: fpc.cfg
       shell: bash
       run: |
-           fpcmkcfg -d basepath="${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/" -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
+           fpcmkcfg -d basepath="${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed" -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
            echo "PPC_CONFIG_PATH=${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg" >> $GITHUB_ENV

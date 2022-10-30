@@ -94,7 +94,7 @@ runs:
       if: runner.os == 'Windows'
       shell: bash
       run: |
-           fpcmkcfg -d basepath='$FPC_INSTALLED_DIR' -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
+           fpcmkcfg -d basepath='$FPC_INSTALLED_DIR$' -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
            echo "PPC_CONFIG_PATH=${{ github.workspace }}/.fpc-${{ inputs.version }}" >> $GITHUB_ENV
            echo "FPC_INSTALLED_DIR=${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed" >> $GITHUB_ENV
 
@@ -102,6 +102,6 @@ runs:
       if: runner.os != 'Windows'
       shell: bash
       run: |
-           fpcmkcfg -d basepath="\$FPC_INSTALLED_DIR/lib/fpc/${{ inputs.fpc_version }}" -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
+           fpcmkcfg -d basepath="\$FPC_INSTALLED_DIR\$/lib/fpc/${{ inputs.fpc_version }}" -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
            echo "PPC_CONFIG_PATH=${{ github.workspace }}/.fpc-${{ inputs.version }}" >> $GITHUB_ENV
            echo "FPC_INSTALLED_DIR=${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed" >> $GITHUB_ENV

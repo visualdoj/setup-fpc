@@ -89,6 +89,7 @@ runs:
            echo  "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/lib/fpc/${{ inputs.fpc_version }}" >> $GITHUB_PATH
            # TODO the following line is only for macOS until version detection will be supported
            echo  "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/lib/fpc/3.3.1" >> $GITHUB_PATH
+           ls -la "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/bin"
 
     - name: fpc.cfg (Windows)
       if: runner.os == 'Windows'

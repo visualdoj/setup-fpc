@@ -96,16 +96,16 @@ runs:
            echo "PPC_CONFIG_PATH=${{ github.workspace }}/${{ inputs.path }}" >> $GITHUB_ENV
            echo "FPC_INSTALLED_DIR=${{ github.workspace }}/${{ inputs.path }}/installed" >> $GITHUB_ENV
 
-    - name: fpc.cfg (non-Windows)
+    - name: fpc.cfg (Linux)
       if: runner.os == 'Linux'
       shell: bash
       run: |
-           "${{ github.workspace }}/${{ inputs.path }}/installed/bin/fpcmkcfg" -d basepath="\$FPC_INSTALLED_DIR\$/lib/fpc/\$FPCVERSION\$" -o "${{ github.workspace }}/${{ inputs.path }}/fpc.cfg"
            echo "PPC_CONFIG_PATH=${{ github.workspace }}/${{ inputs.path }}" >> $GITHUB_ENV
            echo "FPC_INSTALLED_DIR=${{ github.workspace }}/${{ inputs.path }}/installed" >> $GITHUB_ENV
 
-    - name: fpc.cfg (non-Windows)
+    - name: fpc.cfg (macOS)
       if: runner.os == 'macOS'
       shell: bash
       run: |
+           echo "PPC_CONFIG_PATH=${{ github.workspace }}/${{ inputs.path }}" >> $GITHUB_ENV
            echo "FPC_INSTALLED_DIR=${{ github.workspace }}/${{ inputs.path }}/installed" >> $GITHUB_ENV

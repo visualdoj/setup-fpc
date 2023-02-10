@@ -5,34 +5,26 @@ branding:
   color: '#CE9C63'
 
 inputs:
-  repo-token:
-    description: 'GitHub token'
-    required: true
-    default: ${{ github.token }}
   version:
-    description: 'Logical version of required FPC'
+    description: 'FPC version'
     required: false
-    default: 'stable'
-  os:
-    description: 'OS label'
+    default: '3.2.3'
+  cross:
+    description: 'Cross compiler settings'
     required: false
-    default: 'default'
-  cpu:
-    description: 'Host CPU'
-    required: false
-    default: 'x64'
+    default: 'auto'
   repo:
     description: 'GitHub repo with Free Pascal bundles'
     required: false
     default: 'visualdoj/build-fpc-bundle'
-  tag:
-    description: 'Release tag in the repo with bundles'
+  token:
+    description: 'Token to access the repo'
+    required: true
+    default: ${{ github.token }}
+  path:
+    path: 'Path to install free pascal'
     required: false
-    default: 'bootstrap1'
-  fpc_version:
-    description: 'Numeral version of required FPC'
-    required: false
-    default: '3.2.3'
+    default: .fpc
 
 outputs:
   cache-hit:
@@ -53,62 +45,62 @@ outputs:
 
 runs:
   using: "composite"
+  defaults:
+    run:
+      shell: bash
   steps:
     - name: Cache installed FPC
       id: check-cache
       uses: actions/cache@v3
       with:
-          key:  ".fpc-${{ inputs.version }}"
-          path: ".fpc-${{ inputs.version }}"
+          key:  ".fpc-${{ inputs.version }}-${{ runner.os }}"
+          path: ${{ inputs.path }}
+
+    - run:  mkdir ${{ inputs.path }}
 
     - name: Download FPC bundle
       if: steps.check-cache.outputs.cache-hit != 'true'
-      run:  gh release download --dir .fpc-${{ inputs.version }} --pattern "bundle-${{ runner.os }}.tar.gz" --repo visualdoj/build-fpc-bundle
-      shell: bash
+      run:  gh release download --dir "${{ inputs.path }}" --pattern "fpc-${{ inputs.version }}-${{ runner.os }}.tar.gz" --repo "${{ inputs.repo }}" --skip-existing
       env:
-          GITHUB_TOKEN: ${{ inputs.repo-token }}
+          GITHUB_TOKEN: ${{ inputs.token }}
 
     - name: Unpack tarball 
       if: steps.check-cache.outputs.cache-hit != 'true'
-      working-directory: "${{ github.workspace }}"
-      shell: bash
+      working-directory: "${{ github.workspace }}/${{ inputs.path }}"
       run: |
-          tar xvf ".fpc-${{ inputs.version }}/bundle-${{ runner.os }}.tar.gz" -C ".fpc-${{ inputs.version }}"
+          tar xvf "fpc-${{ inputs.version }}-${{ runner.os }}.tar.gz"
+          rm -f   "fpc-${{ inputs.version }}-${{ runner.os }}.tar.gz"
 
     - name: Configure (Windows)
       if: runner.os == 'Windows'
-      shell: bash
       run: |
-           echo "${{ github.workspace }}\\.fpc-${{ inputs.version }}\\bundle\\installed\\bin\\i386-win32" >> $GITHUB_PATH
+           echo "${{ github.workspace }}\${{ inputs.path }}\installed\bin\i386-win32" >> $GITHUB_PATH
+           cat  $GITHUB_PATH
 
     - name: Configure (non-Windows)
       if: runner.os != 'Windows'
-      shell: bash
       run: |
-           echo  "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/bin" >> $GITHUB_PATH
-           echo  "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/lib/fpc/${{ inputs.fpc_version }}" >> $GITHUB_PATH
+           echo  "${{ github.workspace }}/${{ inputs.path }}/installed/bin" >> $GITHUB_PATH
+           echo  "${{ github.workspace }}/${{ inputs.path }}/installed/lib/fpc/${{ inputs.version }}" >> $GITHUB_PATH
            # TODO the following line is only for macOS until version detection will be supported
-           echo  "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/lib/fpc/3.3.1" >> $GITHUB_PATH
-           ls -la "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/bin"
+           echo  "${{ github.workspace }}/${{ inputs.path }}/installed/lib/fpc/3.3.1" >> $GITHUB_PATH
+           ls -la "${{ github.workspace }}/${{ inputs.path }}/installed"
+           cat $GITHUB_PATH
 
     - name: fpc.cfg (Windows)
       if: runner.os == 'Windows'
-      shell: bash
       run: |
-           fpcmkcfg -d basepath='$FPC_INSTALLED_DIR$' -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
-           echo "PPC_CONFIG_PATH=${{ github.workspace }}/.fpc-${{ inputs.version }}" >> $GITHUB_ENV
-           echo "FPC_INSTALLED_DIR=${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed" >> $GITHUB_ENV
+           echo "PPC_CONFIG_PATH=${{ github.workspace }}/${{ inputs.path }}" >> $GITHUB_ENV
+           echo "FPC_INSTALLED_DIR=${{ github.workspace }}/${{ inputs.path }}/installed" >> $GITHUB_ENV
 
     - name: fpc.cfg (non-Windows)
       if: runner.os == 'Linux'
-      shell: bash
       run: |
-           "${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed/bin/fpcmkcfg" -d basepath="\$FPC_INSTALLED_DIR\$/lib/fpc/\$FPCVERSION\$" -o "${{ github.workspace }}/.fpc-${{ inputs.version }}/fpc.cfg"
-           echo "PPC_CONFIG_PATH=${{ github.workspace }}/.fpc-${{ inputs.version }}" >> $GITHUB_ENV
-           echo "FPC_INSTALLED_DIR=${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed" >> $GITHUB_ENV
+           "${{ github.workspace }}/${{ inputs.path }}/installed/bin/fpcmkcfg" -d basepath="\$FPC_INSTALLED_DIR\$/lib/fpc/\$FPCVERSION\$" -o "${{ github.workspace }}/${{ inputs.path }}/fpc.cfg"
+           echo "PPC_CONFIG_PATH=${{ github.workspace }}/${{ inputs.path }}" >> $GITHUB_ENV
+           echo "FPC_INSTALLED_DIR=${{ github.workspace }}/${{ inputs.path }}/installed" >> $GITHUB_ENV
 
     - name: fpc.cfg (non-Windows)
       if: runner.os == 'macOS'
-      shell: bash
       run: |
-           echo "FPC_INSTALLED_DIR=${{ github.workspace }}/.fpc-${{ inputs.version }}/bundle/installed" >> $GITHUB_ENV
+           echo "FPC_INSTALLED_DIR=${{ github.workspace }}/${{ inputs.path }}/installed" >> $GITHUB_ENV

@@ -45,9 +45,6 @@ outputs:
 
 runs:
   using: "composite"
-  defaults:
-    run:
-      shell: bash
   steps:
     - name: Cache installed FPC
       id: check-cache
@@ -56,10 +53,12 @@ runs:
           key:  ".fpc-${{ inputs.version }}-${{ runner.os }}"
           path: ${{ inputs.path }}
 
-    - run:  mkdir ${{ inputs.path }}
+    - shell: bash
+      run:  mkdir ${{ inputs.path }}
 
     - name: Download FPC bundle
       if: steps.check-cache.outputs.cache-hit != 'true'
+      shell: bash
       run:  gh release download --dir "${{ inputs.path }}" --pattern "fpc-${{ inputs.version }}-${{ runner.os }}.tar.gz" --repo "${{ inputs.repo }}" --skip-existing
       env:
           GITHUB_TOKEN: ${{ inputs.token }}
@@ -67,18 +66,21 @@ runs:
     - name: Unpack tarball 
       if: steps.check-cache.outputs.cache-hit != 'true'
       working-directory: "${{ github.workspace }}/${{ inputs.path }}"
+      shell: bash
       run: |
           tar xvf "fpc-${{ inputs.version }}-${{ runner.os }}.tar.gz"
           rm -f   "fpc-${{ inputs.version }}-${{ runner.os }}.tar.gz"
 
     - name: Configure (Windows)
       if: runner.os == 'Windows'
+      shell: bash
       run: |
            echo "${{ github.workspace }}\${{ inputs.path }}\installed\bin\i386-win32" >> $GITHUB_PATH
            cat  $GITHUB_PATH
 
     - name: Configure (non-Windows)
       if: runner.os != 'Windows'
+      shell: bash
       run: |
            echo  "${{ github.workspace }}/${{ inputs.path }}/installed/bin" >> $GITHUB_PATH
            echo  "${{ github.workspace }}/${{ inputs.path }}/installed/lib/fpc/${{ inputs.version }}" >> $GITHUB_PATH
@@ -89,12 +91,14 @@ runs:
 
     - name: fpc.cfg (Windows)
       if: runner.os == 'Windows'
+      shell: bash
       run: |
            echo "PPC_CONFIG_PATH=${{ github.workspace }}/${{ inputs.path }}" >> $GITHUB_ENV
            echo "FPC_INSTALLED_DIR=${{ github.workspace }}/${{ inputs.path }}/installed" >> $GITHUB_ENV
 
     - name: fpc.cfg (non-Windows)
       if: runner.os == 'Linux'
+      shell: bash
       run: |
            "${{ github.workspace }}/${{ inputs.path }}/installed/bin/fpcmkcfg" -d basepath="\$FPC_INSTALLED_DIR\$/lib/fpc/\$FPCVERSION\$" -o "${{ github.workspace }}/${{ inputs.path }}/fpc.cfg"
            echo "PPC_CONFIG_PATH=${{ github.workspace }}/${{ inputs.path }}" >> $GITHUB_ENV
@@ -102,5 +106,6 @@ runs:
 
     - name: fpc.cfg (non-Windows)
       if: runner.os == 'macOS'
+      shell: bash
       run: |
            echo "FPC_INSTALLED_DIR=${{ github.workspace }}/${{ inputs.path }}/installed" >> $GITHUB_ENV

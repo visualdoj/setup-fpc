@@ -53,9 +53,6 @@ runs:
           key:  ".fpc-${{ inputs.version }}-${{ runner.os }}"
           path: ${{ inputs.path }}
 
-    - shell: bash
-      run:  mkdir ${{ inputs.path }}
-
     - name: Download FPC bundle
       if: steps.check-cache.outputs.cache-hit != 'true'
       shell: bash

@@ -70,12 +70,13 @@ runs:
 
     - name: Fetch FPC bundles for the specified cross compilers
       if: (steps.check-cache.outputs.cache-hit != 'true') && contains(inputs.cross, '-')
+      working-directory: "${{ github.workspace }}/${{ inputs.path }}"
       shell: bash
       run: |
-          gh release download --dir "${{ inputs.path }}" --pattern "fpc-${{ inputs.version }}-${{ runner.os }}-cross.tar.gz" --repo "${{ inputs.repo }}" --skip-existing
+          gh release download --pattern "fpc-${{ inputs.version }}-${{ runner.os }}-cross.tar.gz" --repo "${{ inputs.repo }}" --skip-existing
           tar xvf "fpc-${{ inputs.version }}-${{ runner.os }}-cross.tar.gz"
           rm -f   "fpc-${{ inputs.version }}-${{ runner.os }}-cross.tar.gz"
-          gh release download --dir "${{ inputs.path }}" --pattern "fpc-${{ inputs.version }}-${{ runner.os }}-cross-${{ inputs.cross }}.tar.gz" --repo "${{ inputs.repo }}" --skip-existing
+          gh release download --pattern "fpc-${{ inputs.version }}-${{ runner.os }}-cross-${{ inputs.cross }}.tar.gz" --repo "${{ inputs.repo }}" --skip-existing
           tar xvf "fpc-${{ inputs.version }}-${{ runner.os }}-cross-${{ inputs.cross }}.tar.gz"
           rm -f   "fpc-${{ inputs.version }}-${{ runner.os }}-cross-${{ inputs.cross }}.tar.gz"
       env:

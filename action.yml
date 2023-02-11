@@ -50,7 +50,7 @@ runs:
       id: check-cache
       uses: actions/cache@v3
       with:
-          key:  ".fpc-${{ inputs.version }}-${{ runner.os }}"
+          key:  ".fpc-${{ inputs.version }}-${{ runner.os }}-${{ inputs.cross }}"
           path: ${{ inputs.path }}
 
     - name: Download FPC bundle
@@ -67,6 +67,19 @@ runs:
       run: |
           tar xvf "fpc-${{ inputs.version }}-${{ runner.os }}.tar.gz"
           rm -f   "fpc-${{ inputs.version }}-${{ runner.os }}.tar.gz"
+
+    - name: Fetch FPC bundles for the specified cross compilers
+      if: (steps.check-cache.outputs.cache-hit != 'true') && contains(inputs.cross, '-')
+      shell: bash
+      run: |
+          gh release download --dir "${{ inputs.path }}" --pattern "fpc-${{ inputs.version }}-${{ runner.os }}-cross.tar.gz" --repo "${{ inputs.repo }}" --skip-existing
+          tar xvf "fpc-${{ inputs.version }}-${{ runner.os }}-cross.tar.gz"
+          rm -f   "fpc-${{ inputs.version }}-${{ runner.os }}-cross.tar.gz"
+          gh release download --dir "${{ inputs.path }}" --pattern "fpc-${{ inputs.version }}-${{ runner.os }}-cross-${{ inputs.cross }}.tar.gz" --repo "${{ inputs.repo }}" --skip-existing
+          tar xvf "fpc-${{ inputs.version }}-${{ runner.os }}-cross-${{ inputs.cross }}.tar.gz"
+          rm -f   "fpc-${{ inputs.version }}-${{ runner.os }}-cross-${{ inputs.cross }}.tar.gz"
+      env:
+          GITHUB_TOKEN: ${{ inputs.token }}
 
     - name: Configure (Windows)
       if: runner.os == 'Windows'

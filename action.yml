@@ -106,5 +106,7 @@ runs:
       if: runner.os == 'macOS'
       shell: bash
       run: |
+           sed 's/\$FPCVERSION\$/$FPCVERSION/' "${{ inputs.path }}/fpc.cfg" >fpc.cfg.new
+           mv fpc.cfg.new "${{ inputs.path }}/fpc.cfg"
            echo "PPC_CONFIG_PATH=${{ github.workspace }}/${{ inputs.path }}" >> $GITHUB_ENV
            echo "FPC_INSTALLED_DIR=${{ github.workspace }}/${{ inputs.path }}/installed" >> $GITHUB_ENV
